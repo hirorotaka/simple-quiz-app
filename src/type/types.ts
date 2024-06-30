@@ -10,7 +10,7 @@ export interface Question {
 }
 
 // reactQuizオブジェクトの型を定義
-export interface ReactQuiz {
+export interface Quiz {
   questions: Question[];
 }
 
