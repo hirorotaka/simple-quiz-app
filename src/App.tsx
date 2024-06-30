@@ -1,9 +1,14 @@
+import { useState } from 'react';
 import './App.css';
+import { Quiz } from './components/Quiz/Quiz';
+import { reactQuiz } from './quizConstants';
+import { Question } from './type/types';
 
 function App() {
+  const [questions, setQuestions] = useState<Question[]>(reactQuiz.questions);
   return (
     <>
-      <h1 className="m-2 text-3xl font-bold text-blue-800">Hello world!</h1>
+      <Quiz questions={questions} />
     </>
   );
 }
