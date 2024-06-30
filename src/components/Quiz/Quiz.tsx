@@ -7,9 +7,11 @@ import { AnswerEffect } from '../AnswerTimer/AnswerEffect';
 
 interface QuizProps {
   questions: Question[];
+  playerName: string;
+  setQuizStarted: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-export const Quiz = ({ questions }: QuizProps) => {
+export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
   // 現在の質問のインデックスを保持する状態変数
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   //選択肢の番号を設定
@@ -95,6 +97,7 @@ export const Quiz = ({ questions }: QuizProps) => {
   const onTryAgain = () => {
     setResult(resultInitialState);
     setShowResult(false);
+    setQuizStarted(false);
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -142,9 +145,12 @@ export const Quiz = ({ questions }: QuizProps) => {
         ) : (
           <>
             {showAnswerTimer && (
-              <AnswerTimer duration={5} onTimeUp={handleTimeUp} />
+              <AnswerTimer duration={15} onTimeUp={handleTimeUp} />
             )}
             {showEffect && <AnswerEffect isCorrect={isCorrect} />}
+            <h2 className="mb-4 text-xl font-semibold">
+              こんにちは、{playerName}さん！
+            </h2>
             <div className="mb-4">
               <span className="text-2xl font-bold text-blue-600">
                 {currentQuestionIndex + 1}
@@ -157,7 +163,7 @@ export const Quiz = ({ questions }: QuizProps) => {
               <button
                 onClick={() => onClickNext(answer)}
                 disabled={answerIdx === null && !inputAnswer}
-                className={` ${answerIdx === null ? 'cursor-not-allowed bg-gray-300' : 'bg-blue-500 transition duration-150 ease-in-out hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 '} rounded-lg  px-8 py-3 text-lg font-semibold text-white `}
+                className={` ${answerIdx === null && !inputAnswer ? 'cursor-not-allowed bg-gray-300' : 'bg-blue-500 transition duration-150 ease-in-out hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 '} rounded-lg  px-8 py-3 text-lg font-semibold text-white `}
               >
                 {currentQuestionIndex === questions.length - 1
                   ? '終了'
