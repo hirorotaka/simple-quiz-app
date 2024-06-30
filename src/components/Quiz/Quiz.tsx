@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Question, ResultState } from '../../type/types';
 import { resultInitialState } from '../../quizConstants';
 import { QuizResult } from '../QuizResult/QuizResult';
+import { AnswerTimer } from '../AnswerTimer/AnswerTimer';
 
 interface QuizProps {
   questions: Question[];
@@ -21,13 +22,15 @@ export const Quiz = ({ questions }: QuizProps) => {
   //点数と正解と不正解の結果を保持
   const [result, setResult] = useState<ResultState>(resultInitialState);
 
+  //解答時間を表示する状態を設定
+  const [showAnswerTimer, setShowAnswerTimer] = useState(true);
+
   //結果を表示する状態を設定
   const [showResult, setShowResult] = useState(false);
 
   const onAnwserClick = (answer: string, index: number) => {
     console.log(answer, index);
     setAnswerIdx(index);
-    //クリックした要素の文字列が同じ場合は正解と判定
     if (answer === correctAnswer) {
       setAnswer(true);
     } else {
@@ -35,14 +38,14 @@ export const Quiz = ({ questions }: QuizProps) => {
     }
   };
 
-  //最終的な選択肢を取得して、回答結果を保存して次の質問へ遷移
   const onClickNext = (finalAnswer: boolean | null) => {
     setAnswerIdx(null);
+    setShowAnswerTimer(false);
     setResult((prev) =>
       finalAnswer
         ? {
             ...prev,
-            score: prev.score + 5,
+            score: prev.score + 10,
             correctAnswers: prev.correctAnswers + 1,
           }
         : {
@@ -52,17 +55,27 @@ export const Quiz = ({ questions }: QuizProps) => {
     );
 
     if (currentQuestionIndex !== questions.length - 1) {
-      //次の問題へ
+      // 次の問題へ
       setCurrentQuestionIndex((prev) => prev + 1);
     } else {
-      //終了したら結果を表示
+      // 結果を表示
       setCurrentQuestionIndex(0);
       setAnswerIdx(null);
       setShowResult(true);
     }
+
+    // 次の画面に遷移してから表示
+    setTimeout(() => {
+      setShowAnswerTimer(true);
+    });
   };
 
-  //最初の質問へ戻る
+  //最終的な選択肢を取得して、回答結果を保存して次の質問へ遷移
+  const handleTimeUp = () => {
+    setAnswer(false);
+    onClickNext(false);
+  };
+
   const onTryAgain = () => {
     setResult(resultInitialState);
     setShowResult(false);
@@ -75,6 +88,9 @@ export const Quiz = ({ questions }: QuizProps) => {
           <QuizResult result={result} onTryAgain={onTryAgain} />
         ) : (
           <>
+            {showAnswerTimer && (
+              <AnswerTimer duration={10} onTimeUp={handleTimeUp} />
+            )}
             <div className="mb-4">
               <span className="text-2xl font-bold text-blue-600">
                 {currentQuestionIndex + 1}
@@ -82,7 +98,6 @@ export const Quiz = ({ questions }: QuizProps) => {
               <span className="text-gray-500">/{questions.length}</span>
             </div>
             <h2 className="mb-6 text-2xl font-semibold">{question}</h2>
-
             <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {choices?.map((answer, index) => (
                 <li
@@ -94,7 +109,6 @@ export const Quiz = ({ questions }: QuizProps) => {
                 </li>
               ))}
             </ul>
-
             <div className="mt-8 flex justify-end">
               <button
                 onClick={() => onClickNext(answer)}
