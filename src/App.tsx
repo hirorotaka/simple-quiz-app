@@ -1,12 +1,12 @@
 import { useState } from 'react';
 import './App.css';
 import { Quiz } from './components/Quiz/Quiz';
-import { reactQuiz } from './quizConstants';
+import { prefectureQuiz } from './quizConstants';
 import { Question } from './type/types';
 import { QuizStart } from './components/QuizStart/QuizStart';
 
 function App() {
-  const [questions] = useState<Question[]>(reactQuiz.questions);
+  const [questions] = useState<Question[]>(prefectureQuiz.questions);
   const [quizStarted, setQuizStarted] = useState(false);
   const [playerName, setPlayerName] = useState('');
 
