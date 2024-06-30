@@ -14,8 +14,4 @@
 
 ### 画面
 
-graph TD
-    User((ユーザー))
-    Admin((管理者))
-
-    subgraph "4択クイズアプリ"
+![chrome-capture-2024-6-30](https://github.com/hirorotaka/simple-quiz-app/assets/153050316/d7df3d66-cca9-4a4b-ab73-b00ea805b58a)
