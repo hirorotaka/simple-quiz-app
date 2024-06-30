@@ -79,7 +79,7 @@ export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
       setTimeout(() => {
         setShowAnswerTimer(true);
       }, 0);
-    }, 500); // エフェクトを0.5秒間表示
+    }, 300); // エフェクトを2秒間表示
   };
 
   //最終的な選択肢を取得して、回答結果を保存して次の質問へ遷移
@@ -91,7 +91,7 @@ export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
       setShowEffect(false);
       setAnswer(false);
       onClickNext(false);
-    }, 500); // エフェクトを0.5秒間表示
+    }, 300); // エフェクトを1秒間表示
   };
 
   const onTryAgain = () => {
@@ -136,43 +136,53 @@ export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
       </ul>
     );
   };
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-4xl rounded-lg bg-white p-6 shadow-lg">
-        {showResult ? (
-          <QuizResult result={result} onTryAgain={onTryAgain} />
-        ) : (
-          <>
+      {showResult ? (
+        <QuizResult result={result} onTryAgain={onTryAgain} />
+      ) : (
+        <div className="w-full max-w-4xl rounded-lg bg-white p-6 shadow-lg">
+          <div className="flex min-h-[500px] flex-col justify-between">
             {showAnswerTimer && (
               <AnswerTimer duration={15} onTimeUp={handleTimeUp} />
             )}
             {showEffect && <AnswerEffect isCorrect={isCorrect} />}
-            <h2 className="mb-4 text-xl font-semibold">
-              こんにちは、{playerName}さん！
-            </h2>
-            <div className="mb-4">
-              <span className="text-2xl font-bold text-blue-600">
-                {currentQuestionIndex + 1}
-              </span>
-              <span className="text-gray-500">/{questions.length}</span>
+            <div>
+              <h2 className="mb-4 break-words text-xl font-semibold">
+                こんにちは、{playerName}さん！
+              </h2>
+              <div className="mb-4">
+                <span className="text-2xl font-bold text-blue-600">
+                  {currentQuestionIndex + 1}
+                </span>
+                <span className="text-gray-500">/{questions.length}</span>
+              </div>
+              <h2 className="mb-6 break-words text-2xl font-semibold">
+                {question}
+              </h2>
+              <div className="min-h-[200px]">{getAnswerUI()}</div>
             </div>
-            <h2 className="mb-6 text-2xl font-semibold">{question}</h2>
-            {getAnswerUI()}
             <div className="mt-8 flex justify-end">
               <button
                 onClick={() => onClickNext(answer)}
                 disabled={answerIdx === null && !inputAnswer}
-                className={` ${answerIdx === null && !inputAnswer ? 'cursor-not-allowed bg-gray-300' : 'bg-blue-500 transition duration-150 ease-in-out hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 '} rounded-lg  px-8 py-3 text-lg font-semibold text-white `}
+                className={`
+                ${
+                  answerIdx === null && !inputAnswer
+                    ? 'cursor-not-allowed bg-gray-300'
+                    : 'bg-blue-500 transition duration-150 ease-in-out hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400'
+                } 
+                rounded-lg px-8 py-3 text-lg font-semibold text-white
+              `}
               >
                 {currentQuestionIndex === questions.length - 1
                   ? '終了'
                   : '次へ'}
               </button>
             </div>
-          </>
-        )}
-      </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
