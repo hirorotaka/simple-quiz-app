@@ -3,6 +3,7 @@ import { Question, ResultState } from '../../type/types';
 import { resultInitialState } from '../../quizConstants';
 import { QuizResult } from '../QuizResult/QuizResult';
 import { AnswerTimer } from '../AnswerTimer/AnswerTimer';
+import { AnswerEffect } from '../AnswerTimer/AnswerEffect';
 
 interface QuizProps {
   questions: Question[];
@@ -28,8 +29,13 @@ export const Quiz = ({ questions }: QuizProps) => {
   //結果を表示する状態を設定
   const [showResult, setShowResult] = useState(false);
 
+  //inputAnswerの状態を設定
+  const [inputAnswer, setInputAnswer] = useState('');
+
+  const [showEffect, setShowEffect] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+
   const onAnwserClick = (answer: string, index: number) => {
-    console.log(answer, index);
     setAnswerIdx(index);
     if (answer === correctAnswer) {
       setAnswer(true);
@@ -39,46 +45,93 @@ export const Quiz = ({ questions }: QuizProps) => {
   };
 
   const onClickNext = (finalAnswer: boolean | null) => {
-    setAnswerIdx(null);
-    setShowAnswerTimer(false);
-    setResult((prev) =>
-      finalAnswer
-        ? {
-            ...prev,
-            score: prev.score + 10,
-            correctAnswers: prev.correctAnswers + 1,
-          }
-        : {
-            ...prev,
-            wrongAnswers: prev.wrongAnswers + 1,
-          }
-    );
+    setShowEffect(true);
+    setInputAnswer('');
+    setIsCorrect(finalAnswer === true);
 
-    if (currentQuestionIndex !== questions.length - 1) {
-      // 次の問題へ
-      setCurrentQuestionIndex((prev) => prev + 1);
-    } else {
-      // 結果を表示
-      setCurrentQuestionIndex(0);
-      setAnswerIdx(null);
-      setShowResult(true);
-    }
-
-    // 次の画面に遷移してから表示
     setTimeout(() => {
-      setShowAnswerTimer(true);
-    });
+      setShowEffect(false);
+      setAnswerIdx(null);
+      setShowAnswerTimer(false);
+      setResult((prev) =>
+        finalAnswer
+          ? {
+              ...prev,
+              score: prev.score + 10,
+              correctAnswers: prev.correctAnswers + 1,
+            }
+          : {
+              ...prev,
+              wrongAnswers: prev.wrongAnswers + 1,
+            }
+      );
+
+      if (currentQuestionIndex !== questions.length - 1) {
+        setCurrentQuestionIndex((prev) => prev + 1);
+      } else {
+        setCurrentQuestionIndex(0);
+        setAnswerIdx(null);
+        setShowResult(true);
+      }
+
+      setTimeout(() => {
+        setShowAnswerTimer(true);
+      }, 0);
+    }, 500); // エフェクトを0.5秒間表示
   };
 
   //最終的な選択肢を取得して、回答結果を保存して次の質問へ遷移
   const handleTimeUp = () => {
-    setAnswer(false);
-    onClickNext(false);
+    setShowEffect(true);
+    setIsCorrect(false);
+
+    setTimeout(() => {
+      setShowEffect(false);
+      setAnswer(false);
+      onClickNext(false);
+    }, 500); // エフェクトを0.5秒間表示
   };
 
   const onTryAgain = () => {
     setResult(resultInitialState);
     setShowResult(false);
+  };
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setInputAnswer(e.target.value);
+
+    if (e.target.value === correctAnswer) {
+      setAnswer(true);
+    } else {
+      setAnswer(false);
+    }
+  };
+
+  const getAnswerUI = () => {
+    if (type === 'textInput') {
+      return (
+        <input
+          type="text"
+          value={inputAnswer}
+          onChange={handleInputChange}
+          className="w-80 rounded-lg border border-gray-300 px-4 py-2 text-left text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      );
+    }
+
+    return (
+      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {choices?.map((answer, index) => (
+          <li
+            key={answer}
+            onClick={() => onAnwserClick(answer, index)}
+            className={`rounded-lg border border-gray-300 px-6 py-4 text-left text-lg  ${answerIdx === index ? 'bg-blue-500 text-white' : 'transition duration-150 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500'}`}
+          >
+            {answer}
+          </li>
+        ))}
+      </ul>
+    );
   };
 
   return (
@@ -89,8 +142,9 @@ export const Quiz = ({ questions }: QuizProps) => {
         ) : (
           <>
             {showAnswerTimer && (
-              <AnswerTimer duration={10} onTimeUp={handleTimeUp} />
+              <AnswerTimer duration={5} onTimeUp={handleTimeUp} />
             )}
+            {showEffect && <AnswerEffect isCorrect={isCorrect} />}
             <div className="mb-4">
               <span className="text-2xl font-bold text-blue-600">
                 {currentQuestionIndex + 1}
@@ -98,21 +152,11 @@ export const Quiz = ({ questions }: QuizProps) => {
               <span className="text-gray-500">/{questions.length}</span>
             </div>
             <h2 className="mb-6 text-2xl font-semibold">{question}</h2>
-            <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              {choices?.map((answer, index) => (
-                <li
-                  key={answer}
-                  onClick={() => onAnwserClick(answer, index)}
-                  className={`rounded-lg border border-gray-300 px-6 py-4 text-left text-lg  ${answerIdx === index ? 'bg-blue-500 text-white' : 'transition duration-150 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500'}`}
-                >
-                  {answer}
-                </li>
-              ))}
-            </ul>
+            {getAnswerUI()}
             <div className="mt-8 flex justify-end">
               <button
                 onClick={() => onClickNext(answer)}
-                disabled={answerIdx === null}
+                disabled={answerIdx === null && !inputAnswer}
                 className={` ${answerIdx === null ? 'cursor-not-allowed bg-gray-300' : 'bg-blue-500 transition duration-150 ease-in-out hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 '} rounded-lg  px-8 py-3 text-lg font-semibold text-white `}
               >
                 {currentQuestionIndex === questions.length - 1

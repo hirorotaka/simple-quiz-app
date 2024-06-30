@@ -9,12 +9,12 @@ export const reactQuiz: ReactQuiz = {
       type: 'singleSelect',
       correctAnswer: '仮想DOM',
     },
-    // {
-    //   question:
-    //     'コンポーネント間でデータを渡す方法を提供するのは_________です。',
-    //   type: 'textInput',
-    //   correctAnswer: 'props',
-    // },
+    {
+      question:
+        'コンポーネント間でデータを渡す方法を提供するのは_________です。',
+      type: 'textInput',
+      correctAnswer: 'props',
+    },
     {
       question: 'ReactJSとは何ですか？',
       choices: [
