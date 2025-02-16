@@ -4,6 +4,8 @@ import { resultInitialState } from '../../quizConstants';
 import { QuizResult } from '../QuizResult/QuizResult';
 import { AnswerTimer } from '../AnswerTimer/AnswerTimer';
 import { AnswerEffect } from '../AnswerTimer/AnswerEffect';
+import InputAnswer from './InputAnswer';
+import ChoiceAnswer from './ChoiceAnswer';
 
 type QuizProps = {
   questions: Question[];
@@ -108,33 +110,6 @@ export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
     setQuizStarted(false);
   };
 
-  const getAnswerUI = () => {
-    if (type === 'textInput') {
-      return (
-        <input
-          type="text"
-          value={inputAnswer}
-          onChange={handleInputChange}
-          className="w-80 rounded-lg border border-gray-300 px-4 py-2 text-left text-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      );
-    }
-
-    return (
-      <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        {choices?.map((answer, index) => (
-          <li
-            key={answer}
-            onClick={() => onAnwserClick(answer, index)}
-            className={`rounded-lg border border-gray-300 px-6 py-4 text-left text-lg  ${answerIdx === index ? 'bg-blue-500 text-white' : 'transition duration-150 ease-in-out hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500'}`}
-          >
-            {answer}
-          </li>
-        ))}
-      </ul>
-    );
-  };
-
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
       {/* クイズ結果 */}
@@ -160,7 +135,20 @@ export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
               <h2 className="mb-6 break-words text-2xl font-semibold">
                 {question}
               </h2>
-              <div className="min-h-[200px]">{getAnswerUI()}</div>
+              <div className="min-h-[200px]">
+                {type === 'textInput' ? (
+                  <InputAnswer
+                    value={inputAnswer}
+                    onInputChange={handleInputChange}
+                  />
+                ) : (
+                  <ChoiceAnswer
+                    answerIdx={answerIdx}
+                    choices={choices}
+                    onAnswerClick={onAnwserClick}
+                  />
+                )}
+              </div>
             </div>
             <div className="mt-8 flex justify-end">
               <button
@@ -171,7 +159,7 @@ export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
                   answerIdx === null && !inputAnswer
                     ? 'cursor-not-allowed bg-gray-300'
                     : 'bg-blue-500 transition duration-150 ease-in-out hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400'
-                } 
+                }
                 rounded-lg px-8 py-3 text-lg font-semibold text-white
               `}
               >
