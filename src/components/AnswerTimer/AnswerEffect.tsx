@@ -1,6 +1,6 @@
-interface AnswerEffectProps {
+type AnswerEffectProps = {
   isCorrect: boolean;
-}
+};
 
 export const AnswerEffect = ({ isCorrect }: AnswerEffectProps) => (
   <div className="fixed inset-0 flex items-center justify-center">

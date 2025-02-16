@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 
-interface QuizStartProps {
+type QuizStartProps = {
   onStart: (name: string) => void;
-}
+};
 
 export const QuizStart = ({ onStart }: QuizStartProps) => {
   const [name, setName] = useState('');

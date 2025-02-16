@@ -1,9 +1,9 @@
-import { ResultState } from '../../type/types';
+import { ResultState } from '../../types';
 
-interface ResultProps {
+type ResultProps = {
   result: ResultState;
   onTryAgain: () => void;
-}
+};
 
 export const QuizResult = ({ result, onTryAgain }: ResultProps) => {
   return (

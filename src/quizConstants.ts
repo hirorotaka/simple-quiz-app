@@ -1,4 +1,4 @@
-import { ResultState, Quiz } from './type/types';
+import { ResultState, Quiz } from './types';
 
 export const prefectureQuiz: Quiz = {
   questions: [
