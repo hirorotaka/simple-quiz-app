@@ -15,7 +15,7 @@ export const prefectureQuiz: Quiz = {
     },
     {
       question: '「富士山」があるのはどこの都道府県ですか？',
-      choices: ['山梨県', '岐阜県', '長野県', '静岡県'],
+      choices: ['滋賀県', '岐阜県', '長野県', '静岡県'],
       type: 'singleSelect',
       correctAnswer: '静岡県',
     },
