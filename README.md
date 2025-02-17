@@ -1,6 +1,6 @@
-# React + TypeScript + Vite
+# クイズアプリの作成
 
-クイズアプリの作成
+- URL:https://simple-choicequiz.netlify.app/
 
 ### 概要
 
