@@ -1,13 +1,12 @@
-import { ChangeEvent, Dispatch, SetStateAction, useRef, useState } from 'react';
+import { ChangeEvent, useRef, useState } from 'react';
 import { resultInitialState } from '../quizConstants';
 import { Question, ResultState } from '../types';
 
 type QuizStartProps = {
   questions: Question[];
-  setQuizStarted: Dispatch<SetStateAction<boolean>>;
 };
 
-export const useQuiz = ({ questions, setQuizStarted }: QuizStartProps) => {
+export const useQuiz = ({ questions }: QuizStartProps) => {
   // 問題・回答関連
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState<number>(0);
   const [answerIdx, setAnswerIdx] = useState<number | null>(null);
@@ -86,25 +85,12 @@ export const useQuiz = ({ questions, setQuizStarted }: QuizStartProps) => {
         setShowAnswerTimer(true);
         isProcessingAnswer.current = false;
       }, 0);
-    }, 300);
+    }, 500);
   };
 
-  const onClickNext = () => {
-    processAnswer(answer);
-  };
-
-  const handleTimeUp = () => {
-    processAnswer(false);
-  };
-
-  const onTryAgain = () => {
-    setResult(resultInitialState);
-    setShowResult(false);
-    setQuizStarted(false);
-  };
   return {
     currentQuestion,
-    question: currentQuestion.question,
+    answer,
     answerIdx,
     inputAnswer,
     isCorrect,
@@ -113,10 +99,10 @@ export const useQuiz = ({ questions, setQuizStarted }: QuizStartProps) => {
     showResult,
     result,
     currentQuestionIndex,
-    onClickNext,
+    setResult,
+    setShowResult,
     onAnwserClick,
     handleInputChange,
-    handleTimeUp,
-    onTryAgain,
+    processAnswer,
   };
 };

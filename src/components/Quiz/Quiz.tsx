@@ -6,6 +6,7 @@ import { AnswerEffect } from '../AnswerTimer/AnswerEffect';
 import InputAnswer from './InputAnswer';
 import ChoiceAnswer from './ChoiceAnswer';
 import { useQuiz } from '../../hooks/useQuiz';
+import { resultInitialState } from '../../quizConstants';
 
 type QuizProps = {
   questions: Question[];
@@ -16,6 +17,7 @@ type QuizProps = {
 export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
   const {
     currentQuestion,
+    answer,
     answerIdx,
     inputAnswer,
     isCorrect,
@@ -24,15 +26,29 @@ export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
     showResult,
     result,
     currentQuestionIndex,
-    onClickNext,
+    setResult,
+    setShowResult,
     onAnwserClick,
+    processAnswer,
     handleInputChange,
-    handleTimeUp,
-    onTryAgain,
   } = useQuiz({
     questions,
-    setQuizStarted,
   });
+
+  const onClickNext = () => {
+    processAnswer(answer);
+  };
+
+  const handleTimeUp = () => {
+    processAnswer(false);
+  };
+
+  const onTryAgain = () => {
+    setResult(resultInitialState);
+    setShowResult(false);
+    setQuizStarted(false);
+  };
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-gray-100 px-4 sm:px-6 lg:px-8">
       {/* クイズ結果 */}
