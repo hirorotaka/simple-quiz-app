@@ -16,7 +16,7 @@ export const useQuiz = ({ questions }: QuizStartProps) => {
   // UI表示制御
   const [showAnswerTimer, setShowAnswerTimer] = useState(true);
   const [showEffect, setShowEffect] = useState(false);
-  const [isCorrect, setIsCorrect] = useState(false);
+  const [isCorrect, setIsCorrect] = useState<boolean | null>(null);
   const [showResult, setShowResult] = useState(false);
 
   // 結果管理
@@ -29,7 +29,7 @@ export const useQuiz = ({ questions }: QuizStartProps) => {
   const currentQuestion = questions[currentQuestionIndex];
 
   // 選択式問題の回答処理
-  const onAnwserClick = (answer: string, index: number) => {
+  const handleAnswerClick = (answer: string, index: number) => {
     setAnswerIdx(index);
     if (answer === currentQuestion.correctAnswer) {
       setAnswer(true);
@@ -44,48 +44,57 @@ export const useQuiz = ({ questions }: QuizStartProps) => {
     setAnswer(e.target.value === currentQuestion.correctAnswer);
   };
 
-  const processAnswer = (finalAnswer: boolean | null) => {
+  const AnswerSHowEffect = async (finalAnswer: boolean | null) => {
+    setShowEffect(true); // 正誤エフェクト表示
+    setIsCorrect(finalAnswer === true);
+
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
+    setShowEffect(false);
+    setIsCorrect(null);
+  };
+
+  const ProgressBarStart = () => {
+    setShowAnswerTimer(true);
+  };
+
+  const processAnswer = async (finalAnswer: boolean | null) => {
     // 重複回答防止
     if (isProcessingAnswer.current) return;
     isProcessingAnswer.current = true;
 
-    setShowEffect(true); // 正誤エフェクト表示
-    setInputAnswer('');
-    setIsCorrect(finalAnswer === true);
+    // 正誤エフェクトの表示
+    await AnswerSHowEffect(finalAnswer);
 
-    // 300ms後に次の問題へ移行
-    setTimeout(() => {
-      setShowEffect(false);
+    // 回答タイマーの停止(アンマウントさせるため)
+    setShowAnswerTimer(false);
+
+    // スコアと正誤カウントの更新
+    setResult((prev) =>
+      finalAnswer
+        ? {
+            ...prev,
+            score: prev.score + 10,
+            correctAnswers: prev.correctAnswers + 1,
+          }
+        : {
+            ...prev,
+            wrongAnswers: prev.wrongAnswers + 1,
+          }
+    );
+
+    // 次の問題への移行か結果表示の判定
+    if (currentQuestionIndex !== questions.length - 1) {
+      setCurrentQuestionIndex((prev) => prev + 1);
       setAnswerIdx(null);
-      setShowAnswerTimer(false);
-      // スコアと正誤カウントの更新
-      setResult((prev) =>
-        finalAnswer
-          ? {
-              ...prev,
-              score: prev.score + 10,
-              correctAnswers: prev.correctAnswers + 1,
-            }
-          : {
-              ...prev,
-              wrongAnswers: prev.wrongAnswers + 1,
-            }
-      );
+      setInputAnswer('');
+    } else {
+      setCurrentQuestionIndex(0);
+      setAnswerIdx(null);
+      setShowResult(true);
+    }
 
-      // 次の問題への移行か結果表示の判定
-      if (currentQuestionIndex !== questions.length - 1) {
-        setCurrentQuestionIndex((prev) => prev + 1);
-      } else {
-        setCurrentQuestionIndex(0);
-        setAnswerIdx(null);
-        setShowResult(true);
-      }
-
-      setTimeout(() => {
-        setShowAnswerTimer(true);
-        isProcessingAnswer.current = false;
-      }, 0);
-    }, 500);
+    isProcessingAnswer.current = false;
   };
 
   return {
@@ -101,8 +110,9 @@ export const useQuiz = ({ questions }: QuizStartProps) => {
     currentQuestionIndex,
     setResult,
     setShowResult,
-    onAnwserClick,
+    handleAnswerClick,
     handleInputChange,
     processAnswer,
+    ProgressBarStart,
   };
 };

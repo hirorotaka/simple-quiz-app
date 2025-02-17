@@ -1,4 +1,4 @@
-import { Dispatch, SetStateAction } from 'react';
+import { Dispatch, SetStateAction, useEffect } from 'react';
 import { Question } from '../../types';
 import { QuizResult } from '../QuizResult/QuizResult';
 import { AnswerTimer } from '../AnswerTimer/AnswerTimer';
@@ -28,12 +28,19 @@ export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
     currentQuestionIndex,
     setResult,
     setShowResult,
-    onAnwserClick,
+    handleAnswerClick,
     processAnswer,
     handleInputChange,
+    ProgressBarStart,
   } = useQuiz({
     questions,
   });
+
+  useEffect(() => {
+    if (!showResult) {
+      ProgressBarStart();
+    }
+  }, [currentQuestionIndex]);
 
   const onClickNext = () => {
     processAnswer(answer);
@@ -58,7 +65,7 @@ export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
         <div className="w-full max-w-4xl rounded-lg bg-white p-6 shadow-lg">
           <div className="flex min-h-[500px] flex-col justify-between">
             {showAnswerTimer && (
-              <AnswerTimer duration={20} onTimeUp={handleTimeUp} />
+              <AnswerTimer duration={15} onTimeUp={handleTimeUp} />
             )}
             {showEffect && <AnswerEffect isCorrect={isCorrect} />}
             <div>
@@ -84,7 +91,7 @@ export const Quiz = ({ questions, playerName, setQuizStarted }: QuizProps) => {
                   <ChoiceAnswer
                     answerIdx={answerIdx}
                     choices={currentQuestion.choices}
-                    onAnswerClick={onAnwserClick}
+                    onAnswerClick={handleAnswerClick}
                   />
                 )}
               </div>

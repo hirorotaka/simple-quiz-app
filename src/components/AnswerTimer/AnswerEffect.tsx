@@ -1,5 +1,5 @@
 type AnswerEffectProps = {
-  isCorrect: boolean;
+  isCorrect: boolean | null;
 };
 
 export const AnswerEffect = ({ isCorrect }: AnswerEffectProps) => (
